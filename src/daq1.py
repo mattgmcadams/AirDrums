@@ -13,8 +13,8 @@ import serial
 
 serL = serial.Serial('/dev/ttyACM0', 9600) # open serial port
 print(serL.name)     #check which port was really used
-serR = serial.Serial('/dev/ttyACM1', 9600)
-print(serR.name)
+#serR = serial.Serial('/dev/ttyACM1', 9600)
+#print(serR.name)
 
 # set path in which you want to save images
 path = 'data/raw'
@@ -31,13 +31,13 @@ os.chdir(img_path)
 # i = 1
 
 # dataframe to save timestamps to the saved image
-metadf0 = pd.DataFrame(columns=['timestamp', 'b_0', 'b_1', 'b_2', 'b_3', 'axL', 'ayL', 'azL', 'gxL', 'gyL', 'gzL', 'mxL', 'myL', 'mzL', 'tbsL', 'axR', 'ayR', 'azR', 'gxR', 'gyR', 'gzR', 'mxR', 'myR', 'mzR', 'tbsR', 'trash'])
+metadf0 = pd.DataFrame(columns=['timestamp', 'b_0', 'b_1', 'b_2', 'b_3', 'ax', 'ay', 'az', 'gx', 'gy', 'gz', 'mx', 'my', 'mz', 'tbs', 'trash'])
 # metadf1 = pd.DataFrame(columns=['filename', 'timestamp', 'b_0', 'b_1', 'b_2', 'b_3', 'axL', 'ayL', 'azL', 'gxL', 'gyL', 'gzL', 'mxL', 'myL', 'mzL', 'tbsL', 'axR', 'ayR', 'azR', 'gxR', 'gyR', 'gzR', 'mxR', 'myR', 'mzR', 'tbsR', 'trash'])
 ts1 = time.time()
 
 
 # Open the camera
-video0 = cv2.VideoCapture(0)
+#video0 = cv2.VideoCapture(0)
 # video4 = cv2.VideoCapture(4)
 
 #set up the drums
@@ -88,24 +88,18 @@ while True:
 		# wait for user to press any key
 		key = cv2.waitKey(5)
 
-		binL = serL.readline()
-		binR = serR.readline()
+		binary = serL.readline()
 
-		dataL = str(binL).split(':')
-		dataR = str(binR).split(':')
+		data = str(binary).split(':')
 
 		try:
-			[axL, ayL, azL, gxL, gyL, gzL, mxL, myL, mzL, tbsL] = str(binL).split(':')
-			[axR, ayR, azR, gxR, gyR, gzR, mxR, myR, mzR, tbsR] = str(binR).split(':')
+			[ax, ay, az, gx, gy, gz, mx, my, mz, tbs] = str(bin).split(':')
 			trash = 'none'
-			axL = axL[2:]
-			axR = axR[2:]
-			tbsL = tbsL[:-5]
-			tbsR = tbsR[:-5]
+			ax = ax[2:]
+			tbs = tbs[:-5]
 		except:
-			[axL, ayL, azL, gxL, gyL, gzL, mxL, myL, mzL, tbsL] = None, None, None, None, None, None, None, None, None, None
-			[axR, ayR, azR, gxR, gyR, gzR, mxR, myR, mzR, tbsR] = None, None, None, None, None, None, None, None, None, None
-			trash = f'{dataL}::{dataR}'
+			[ax, ay, az, gx, gy, gz, mx, my, mz, tbs] = None, None, None, None, None, None, None, None, None, None
+			trash = data
 
 
 
@@ -196,11 +190,11 @@ while True:
 		# cv2.imwrite(filename1, img4)
 		# i = i+1
 
-		metadf0.loc[len(metadf0.index)] = [ts2, b0, b1, b2, b3, axL, ayL, azL, gxL, gyL, gzL, mxL, myL, mzL, tbsL, axR, ayR, azR, gxR, gyR, gzR, mxR, myR, mzR, tbsR, trash]
+		metadf0.loc[len(metadf0.index)] = [ts2, b0, b1, b2, b3, axL, ayL, azL, gxL, gyL, gzL, mxL, myL, mzL, tbsL, trash]
 		# metadf1.loc[len(metadf1.index)] = [ts2, b0, b1, b2, b3, axL, ayL, azL, gxL, gyL, gzL, mxL, myL, mzL, tbsL, axR, ayR, azR, gxR, gyR, gzR, mxR, myR, mzR, tbsR, trash]
 
 # # close the camera
-video0.release()
+#video0.release()
 # video4.release()
 
 # close open windows
