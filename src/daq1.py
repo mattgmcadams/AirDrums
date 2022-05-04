@@ -16,7 +16,7 @@ print(serL.name)     #check which port was really used
 #serR = serial.Serial('/dev/ttyACM1', 9600)
 #print(serR.name)
 
-# set path in which you want to save images
+# series path in which you want to save images
 path = 'data/raw'
 dt = datetime.now().strftime("%m%d%Y-%H%M%S")
 
@@ -40,7 +40,7 @@ ts1 = time.time()
 #video0 = cv2.VideoCapture(0)
 # video4 = cv2.VideoCapture(4)
 
-#set up the drums
+#series up the drums
 gamepadType = Gamepad.PS4
 button0 = 'CROSS'
 button1 = 'CIRCLE'
@@ -59,67 +59,77 @@ print('Gamepad connected')
 start = False
 img0 = cv2.imread('/home/matt/Documents/Drummers/sticks02.jpg', cv2.IMREAD_REDUCED_GRAYSCALE_2)
 
-while gamepad.isConnected():
+series = 'train'
 
-	# Wait for the next event
-	eventType, control, value = gamepad.getNextEvent()
+while True:
+	while gamepad.isConnected():
 
-	if control == buttonStart:
-		if value:
-			start = True
-			sleep(2)
-			break
+		# Wait for the next event
+		eventType, control, value = gamepad.getNextEvent()
+
+		if control == buttonStart:
+			if value:
+				start = True
+				sleep(2)
+				break
+
+		if control == buttonExit:
+			if value:
+				exit()
+
+	if series == 'test':
+		rng = 5000
+	elif series == 'train':
+		rng = 20000
+
+	for _ in range(rng):
+
+		if start:
+
+			cv2.imshow('inspirational image', img0)
+
+			# wait for user to press any key
+			key = cv2.waitKey(2)
+			binary = serL.readline()
+			data = str(binary).split(':')
+			try:
+				[ax, ay, az, gx, gy, gz, mx, my, mz, tbs] = str(bin).split(':')
+				trash = 'none'
+				ax = ax[2:]
+				tbs = tbs[:-5]
+			except:
+				[ax, ay, az, gx, gy, gz, mx, my, mz, tbs] = None, None, None, None, None, None, None, None, None, None
+				trash = data
+
+			b0, b1, b2, b3 = 0, 0, 0, 0
+
+			if key == ord('q'):
+				start = False
+				break
+			if key == ord('v'):
+				start = False
+				break
+			if key == ord('a'):
+				print(' ~~  ~~ |||| ~~ ')
+				b0 = 1
+			if key == ord('s'):
+				print(' ~~  ~~  ~~ ||||')
+				b1 = 1
+			if key == ord('d'):
+				print('|||| ~~  ~~  ~~ ')
+				b2 = 1
+			if key == ord('f'):
+				print(' ~~ |||| ~~  ~~')
+				b3 = 1
 
 
-for _ in range(20000):
+			ts2 = time.time()# - ts1
 
+			metadf0.loc[len(metadf0.index)] = [ts2, b0, b1, b2, b3, ax, ay, az, gx, gy, gz, mx, my, mz, tbs, trash]
 
-	if start:
+	# close open windows
+	cv2.destroyAllWindows()
 
-		cv2.imshow('inspirational image', img0)
-
-		#fafafaf wait for user to press any key
-		key = cv2.waitKey(2)
-		binary = serL.readline()
-		data = str(binary).split(':')
-		try:
-			[ax, ay, az, gx, gy, gz, mx, my, mz, tbs] = str(bin).split(':')
-			trash = 'none'
-			ax = ax[2:]
-			tbs = tbs[:-5]
-		except:
-			[ax, ay, az, gx, gy, gz, mx, my, mz, tbs] = None, None, None, None, None, None, None, None, None, None
-			trash = data
-
-		b0, b1, b2, b3 = 0, 0, 0, 0
-
-		if key == ord('q'):
-			start = False
-			break
-		if key == ord('v'):
-			start = False
-			break
-		if key == ord('a'):
-			print(' ~~  ~~ |||| ~~ ')
-			b0 = 1
-		if key == ord('s'):
-			print(' ~~  ~~  ~~ ||||')
-			b1 = 1
-		if key == ord('d'):
-			print('|||| ~~  ~~  ~~ ')
-			b2 = 1
-		if key == ord('f'):
-			print(' ~~ |||| ~~  ~~')
-			b3 = 1
-
-
-		ts2 = time.time()# - ts1
-
-		metadf0.loc[len(metadf0.index)] = [ts2, b0, b1, b2, b3, ax, ay, az, gx, gy, gz, mx, my, mz, tbs, trash]
-
-# close open windows
-cv2.destroyAllWindows()
-
-# save meta to csv
-metadf0.to_csv('meta.csv', index=False)
+	# save meta to csv
+	metadf0.to_csv(f'{series}_meta.csv', index=False)
 
